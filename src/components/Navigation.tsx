@@ -4,12 +4,9 @@ import { Menu, X, Globe } from 'lucide-react';
 const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [language, setLanguage] = useState<'EN' | 'AR'>(
-    (localStorage.getItem('lang') as 'EN' | 'AR') || 'EN'
-  );
+  const language = localStorage.getItem('lang') || 'EN';
 
   useEffect(() => {
-    localStorage.setItem('lang', language);
     document.documentElement.dir = language === 'AR' ? 'rtl' : 'ltr';
     document.documentElement.lang = language === 'AR' ? 'ar' : 'en';
 
@@ -24,7 +21,6 @@ const Navigation = () => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 100);
     };
-
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -51,10 +47,8 @@ const Navigation = () => {
 
   const toggleLanguage = () => {
     const newLang = language === 'EN' ? 'AR' : 'EN';
-    setLanguage(newLang);
     localStorage.setItem('lang', newLang);
-    // ده السطر السحري اللي بيبعت الإشارة للموقع كله من غير ما يهنج
-    window.dispatchEvent(new Event('languageChanged'));
+    window.location.reload(); // التحديث السريع اللي بيحمي الأنيميشن
   };
 
   return (
