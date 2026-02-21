@@ -4,7 +4,25 @@ import { Menu, X, Globe } from 'lucide-react';
 const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [language, setLanguage] = useState<'EN' | 'AR'>('EN');
+  // بنقرا اللغة من المتصفح، لو مفيش بنخليها إنجليزي
+  const [language, setLanguage] = useState<'EN' | 'AR'>(
+    (localStorage.getItem('lang') as 'EN' | 'AR') || 'EN'
+  );
+
+  // التأثير ده بيشتغل أول ما الموقع يفتح ولما اللغة تتغير
+  useEffect(() => {
+    localStorage.setItem('lang', language);
+    // ده اللي بيقلب اتجاه الموقع كله يمين أو شمال
+    document.documentElement.dir = language === 'AR' ? 'rtl' : 'ltr';
+    document.documentElement.lang = language === 'AR' ? 'ar' : 'en';
+
+    // بنضيف كلاس للعربي عشان لو حبينا نغير خطوط أو مسافات مخصوص للعربي
+    if (language === 'AR') {
+      document.body.classList.add('font-arabic');
+    } else {
+      document.body.classList.remove('font-arabic');
+    }
+  }, [language]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -15,11 +33,17 @@ const Navigation = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const navLinks = [
+  // ترجمنا الروابط بناءً على اللغة
+  const navLinks = language === 'EN' ? [
     { label: 'Services', href: '#services' },
     { label: 'Projects', href: '#projects' },
     { label: 'Portal', href: '#portal' },
     { label: 'Contact', href: '#contact' },
+  ] : [
+    { label: 'خدماتنا', href: '#services' },
+    { label: 'مشاريعنا', href: '#projects' },
+    { label: 'البوابة', href: '#portal' },
+    { label: 'اتصل بنا', href: '#contact' },
   ];
 
   const scrollToSection = (href: string) => {
@@ -28,6 +52,10 @@ const Navigation = () => {
       element.scrollIntoView({ behavior: 'smooth' });
     }
     setIsMobileMenuOpen(false);
+  };
+
+  const toggleLanguage = () => {
+    setLanguage(prev => prev === 'EN' ? 'AR' : 'EN');
   };
 
   return (
@@ -40,7 +68,7 @@ const Navigation = () => {
         }`}
       >
         <div className="w-full px-6 lg:px-[7vw]">
-          <div className="flex items-center justify-between h-16 lg:h-20">
+          <div className={`flex items-center justify-between h-16 lg:h-20 ${language === 'AR' ? 'flex-row-reverse' : ''}`}>
             {/* Logo */}
             <a
               href="#"
@@ -58,12 +86,12 @@ const Navigation = () => {
             </a>
 
             {/* Desktop Navigation */}
-            <div className="hidden lg:flex items-center gap-8">
+            <div className={`hidden lg:flex items-center gap-8 ${language === 'AR' ? 'flex-row-reverse' : ''}`}>
               {navLinks.map((link) => (
                 <button
                   key={link.label}
                   onClick={() => scrollToSection(link.href)}
-                  className="text-sm text-gray-cool hover:text-white transition-colors relative group"
+                  className={`text-sm text-gray-cool hover:text-white transition-colors relative group ${language === 'AR' ? 'font-bold text-base' : ''}`}
                 >
                   {link.label}
                   <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-primary transition-all duration-300 group-hover:w-full" />
@@ -72,11 +100,12 @@ const Navigation = () => {
               
               {/* Language Toggle */}
               <button
-                onClick={() => setLanguage(language === 'EN' ? 'AR' : 'EN')}
+                onClick={toggleLanguage}
                 className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/20 text-sm text-gray-cool hover:border-primary/50 hover:text-white transition-all"
+                dir="ltr"
               >
                 <Globe className="w-4 h-4" />
-                <span className="font-mono text-xs">{language}</span>
+                <span className="font-mono text-xs font-bold">{language === 'EN' ? 'عربي' : 'EN'}</span>
               </button>
             </div>
 
@@ -96,9 +125,9 @@ const Navigation = () => {
         className={`fixed inset-0 z-[99] bg-navy-900/98 backdrop-blur-lg transition-all duration-500 lg:hidden ${
           isMobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
         }`}
+        dir={language === 'AR' ? 'rtl' : 'ltr'}
       >
         <div className="flex flex-col items-center justify-center h-full gap-8">
-          {/* Mobile Logo */}
           <img 
             src="/logo-main.jpg" 
             alt="Afaq Al-Tatweer"
@@ -109,7 +138,7 @@ const Navigation = () => {
             <button
               key={link.label}
               onClick={() => scrollToSection(link.href)}
-              className="text-2xl font-heading text-white hover:text-primary transition-colors"
+              className={`text-2xl text-white hover:text-primary transition-colors ${language === 'AR' ? 'font-bold' : 'font-heading'}`}
               style={{
                 animationDelay: `${index * 100}ms`,
               }}
@@ -119,11 +148,12 @@ const Navigation = () => {
           ))}
           
           <button
-            onClick={() => setLanguage(language === 'EN' ? 'AR' : 'EN')}
+            onClick={toggleLanguage}
             className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/20 text-gray-cool hover:border-primary/50 hover:text-white transition-all mt-4"
+            dir="ltr"
           >
             <Globe className="w-5 h-5" />
-            <span className="font-mono">{language === 'EN' ? 'English' : 'العربية'}</span>
+            <span className="font-mono font-bold">{language === 'EN' ? 'العربية' : 'English'}</span>
           </button>
         </div>
       </div>
