@@ -11,7 +11,7 @@ interface HeroSectionProps {
 
 const HeroSection = ({ className = '' }: HeroSectionProps) => {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const headlineRef = useRef<HTMLHeadingElement>(null);
+  const headlineRef = useRef<HTMLDivElement>(null); // Changed to DivElement to hold our logos
   const subheadlineRef = useRef<HTMLParagraphElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -38,13 +38,13 @@ const HeroSection = ({ className = '' }: HeroSectionProps) => {
         '-=0.6'
       );
 
-      // Headline (split by words)
+      // Logos Animation (Replacing the old text word stagger)
       if (headlineRef.current) {
-        const words = headlineRef.current.querySelectorAll('.word');
+        const logos = headlineRef.current.querySelectorAll('.logo-img');
         tl.fromTo(
-          words,
-          { y: 40, opacity: 0 },
-          { y: 0, opacity: 1, stagger: 0.06, duration: 0.9 },
+          logos,
+          { y: 40, opacity: 0, scale: 0.95 },
+          { y: 0, opacity: 1, scale: 1, stagger: 0.2, duration: 1 },
           '-=0.3'
         );
       }
@@ -83,7 +83,6 @@ const HeroSection = ({ className = '' }: HeroSectionProps) => {
           pin: true,
           scrub: 0.6,
           onLeaveBack: () => {
-            // Reset all elements to visible when scrolling back to top
             gsap.set([headlineRef.current, subheadlineRef.current, ctaRef.current, cardRef.current, microLabelRef.current], {
               opacity: 1, x: 0, y: 0
             });
@@ -92,10 +91,6 @@ const HeroSection = ({ className = '' }: HeroSectionProps) => {
         },
       });
 
-      // ENTRANCE (0%-30%): Hold - already visible from load animation
-      // SETTLE (30%-70%): Hold
-      
-      // EXIT (70%-100%)
       scrollTl.fromTo(
         [headlineRef.current, subheadlineRef.current, ctaRef.current, microLabelRef.current],
         { x: 0, opacity: 1 },
@@ -157,18 +152,24 @@ const HeroSection = ({ className = '' }: HeroSectionProps) => {
           </span>
         </div>
 
-        {/* Headline Block */}
+        {/* Logos Block (Replaced the text headline) */}
         <div className="max-w-[46vw] mt-[4vh]">
-          <h1
-            ref={headlineRef}
-            className="font-heading text-hero font-bold text-white leading-[0.95] mb-6"
-          >
-            <span className="word inline-block">We</span>{' '}
-            <span className="word inline-block">build</span>{' '}
-            <span className="word inline-block">systems</span>{' '}
-            <span className="word inline-block">that</span>{' '}
-            <span className="word inline-block text-primary">last.</span>
-          </h1>
+          <div ref={headlineRef} className="flex flex-col items-start gap-4 mb-8">
+            {/* الشعار الدائري */}
+            <img 
+              src="/logo1.png" 
+              alt="Afaq Logo Circle" 
+              className="logo-img w-32 md:w-48 lg:w-56 drop-shadow-[0_10px_15px_rgba(0,0,0,0.6)]"
+              style={{ filter: "drop-shadow(0px 8px 12px rgba(255, 255, 255, 0.1))" }}
+            />
+            {/* الشعار النصي */}
+            <img 
+              src="/logo2.png" 
+              alt="Afaq Logo Text" 
+              className="logo-img w-64 md:w-80 lg:w-[450px] drop-shadow-[0_10px_15px_rgba(0,0,0,0.6)]"
+              style={{ filter: "drop-shadow(0px 8px 12px rgba(255, 255, 255, 0.1))" }}
+            />
+          </div>
 
           <p
             ref={subheadlineRef}
